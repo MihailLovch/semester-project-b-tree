@@ -8,12 +8,6 @@ public class BTree {
         root.isLeaf = true;
     }
 
-//    public boolean contains(BTNode node, int key){
-//        if (root == null){
-//            return false;
-//        }
-//    }
-
     public BTNode search(BTNode node, int key) {
         int count = -1;
         if (node == null)
@@ -80,8 +74,9 @@ public class BTree {
             node.keys[count + 1] = key;
             node.n = node.n + 1;
         } else {
-            while (count >= 0 && node.keys[count] > key)
+            while (count >= 0 && node.keys[count] > key) {
                 count--;
+            }
             if (node.children[count + 1].n == 2 * T - 1) {
                 split(node, count + 1, node.children[count + 1]);
                 // После разделения ключ в середине дочернего узла перемещается вверх, а дочерний узел разделяется на два
@@ -163,7 +158,7 @@ public class BTree {
         }
         ptr = ptr.children[position + 1];
         int newkey;
-        while (ptr.isLeaf == false) {
+        while (!ptr.isLeaf) {
             ptr = ptr.children[0];
         }
         if (ptr.n > (T - 1)) {
@@ -174,7 +169,9 @@ public class BTree {
             ptr = node;
             ptr = ptr.children[position];
             newkey = ptr.keys[ptr.n - 1];
-            while (ptr.isLeaf == false) ptr = ptr.children[ptr.n];
+            while (!ptr.isLeaf){
+                ptr = ptr.children[ptr.n];
+            }
             newkey = ptr.keys[ptr.n - 1];
             node.keys[position] = newkey;
             if (ptr.n > (T - 1)) removeFromNode(newkey, ptr);
@@ -303,7 +300,7 @@ public class BTree {
                 break;
             }
         }
-        if (ptr.isLeaf == true) {
+        if (ptr.isLeaf) {
             if (ptr.n > (T - 1)) removeFromNode(key, ptr);
             else removeLeaf(key, ptr);
         } else {
@@ -320,14 +317,6 @@ public class BTree {
         BTNode children[] = new BTNode[n + 1];
         boolean isLeaf = true;
         BTNode parent;
-
-        public int getParent(int index) {
-            BTNode cur = children[index];
-            while (!cur.isLeaf)
-                cur = cur.children[cur.n];
-
-            return cur.keys[cur.n - 1];
-        }
 
         public BTNode(Boolean isLeaf) {
             this.isLeaf = isLeaf;
