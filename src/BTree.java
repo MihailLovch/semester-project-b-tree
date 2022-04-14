@@ -1,5 +1,3 @@
-package BTree;
-
 public class BTree {
     public final int T;
     public BTNode root;
@@ -15,27 +13,12 @@ public class BTree {
         this.root = root;
     }
 
-    public BTNode search(BTNode node, int key) {
-        int count = -1;
-        if (node == null)
-            return null;
+    public BTNode search(int key) {
+        return searchHelper(root, key);
+    }
 
-        for (int i = 0; i < node.n; i++) {
-            if (key < node.keys[i]) {
-                break;
-            }
-
-            if (key == node.keys[i]) {
-                return node;
-            }
-        }
-        if (node.isLeaf) {
-            return null;
-        }
-        //Рекурсивно проходимся по детям
-        else {
-            return search(node.children[++count], key);
-        }
+    public boolean remove(int key){
+        return removeHelper(root, key);
     }
 
     private void split(BTNode x, int pos, BTNode y) {
@@ -54,13 +37,13 @@ public class BTree {
 
         y.n = T - 1;
 
-        // Вставляем новый дочерний узел в дочерний узел
+        // Inserting a new child node into a child node
         for (int j = x.n - 1; j >= pos + 1; j--) {
             x.children[j + 1] = x.children[j];
         }
         x.children[pos + 1] = z;
 
-        // Перемещаем ключ у к узлу х
+        // Moving the key y to node x
         for (int j = x.n - 2; j >= pos; j--) {
             x.keys[j + 1] = x.keys[j];
         }
@@ -86,7 +69,7 @@ public class BTree {
             }
             if (node.children[count] != null && node.children[count].n == 2 * T - 1) {
                 split(node, count + 1, node.children[count + 1]);
-                // После разделения ключ в середине дочернего узла перемещается вверх, а дочерний узел разделяется на два
+                // After splitting, the key in the middle of the child node is moved up, and the child node is split into two
                 if (node.keys[count + 1] < key)
                     count++;
             }
@@ -105,9 +88,9 @@ public class BTree {
         } else {
             if (root.n == 2 * T - 1) {
                 BTNode s = new BTNode(false);
-                // Старый корневой узел становится дочерним узлом нового корневого узла
+                // The old root node becomes a child node of the new root node
                 s.children[0] = root;
-                // Отделяем старый корневой узел и даем ключ новому узлу
+                // We separate the old root node and give the key to the new node
                 split(s, 0, root);
                 insertNotFull(s, key);
                 root = s;
@@ -144,7 +127,7 @@ public class BTree {
             return;
         }
 
-        if (search(node, key) == null) {
+        if (searchHelper(node, key) == null) {
             return;
         }
 
@@ -190,12 +173,12 @@ public class BTree {
         }
     }
 
-    public void removeLeaf(int key, BTNode node) {
+    private void removeLeaf(int key, BTNode node) {
         if (node == null) {
             return;
         }
 
-        if (search(node, key) == null) {
+        if (searchHelper(node, key) == null) {
             return;
         }
         if ((node == root) && (node.n == 1)) {
@@ -273,13 +256,35 @@ public class BTree {
             }
         }
     }
+    private BTNode searchHelper(BTNode node, int key) { //auxiliary method for search
+        int count = -1;
+        if (node == null)
+            return null;
 
-    public boolean remove(BTNode node, int key) {
+        for (int i = 0; i < node.n; i++) {
+            if (key < node.keys[i]) {
+                break;
+            }
+
+            if (key == node.keys[i]) {
+                return node;
+            }
+        }
+        if (node.isLeaf) {
+            return null;
+        }
+        //Recursively going through the children
+        else {
+            return searchHelper(node.children[++count], key);
+        }
+    }
+
+    private boolean removeHelper(BTNode node, int key) { //auxiliary method for remove
         if (node == null) {
             return false;
         }
 
-        if (search(node, key) == null) {
+        if (searchHelper(node, key) == null) {
             return false;
         }
 
@@ -313,7 +318,7 @@ public class BTree {
             if (ptr.n > (T - 1)) removeFromNode(key, ptr);
             else removeLeaf(key, ptr);
         } else {
-            remove(ptr, key);
+            removeHelper(ptr, key);
         }
 
         return true;
