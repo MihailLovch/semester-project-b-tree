@@ -9,16 +9,13 @@ public class GenerateInput {
     private static final Path PATH = Paths.get("C:\\Users\\MihailLovch\\IdeaProjects\\semester-project-b-tree\\dataset");
 
     public static void main(String[] args) throws IOException {
-        GenerateInput generateInput = new GenerateInput();
-        generateInput.fillPackage(PATH.resolve("insert"));
-        generateInput.fillPackage(PATH.resolve("remove"));
-        generateInput.fillPackage(PATH.resolve("search"));
+        generateData();
 //        FileReader fileReader = new FileReader(new File(PATH.resolve("insert").resolve("1").resolve("100.txt").toString()));
 //        for (int i = 0; i < 100; i++){
 //            System.out.println(fileReader.read());
 //        }
     }
-    public void generateData() throws IOException{
+    public static void generateData() throws IOException{
         GenerateInput generateInput = new GenerateInput();
         generateInput.fillPackage(PATH.resolve("insert"));
         generateInput.fillPackage(PATH.resolve("remove"));
