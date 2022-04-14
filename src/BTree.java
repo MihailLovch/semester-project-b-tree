@@ -1,11 +1,18 @@
+package BTree;
+
 public class BTree {
     public final int T;
     public BTNode root;
 
     public BTree(int t) {
         T = t;
+        this.root = new BTNode(true);
         root.n = 0;
-        root.isLeaf = true;
+    }
+
+    public BTree(int t, BTNode root) {
+        T = t;
+        this.root = root;
     }
 
     public BTNode search(BTNode node, int key) {
@@ -48,13 +55,13 @@ public class BTree {
         y.n = T - 1;
 
         // Вставляем новый дочерний узел в дочерний узел
-        for (int j = x.n; j >= pos + 1; j--) {
+        for (int j = x.n - 1; j >= pos + 1; j--) {
             x.children[j + 1] = x.children[j];
         }
         x.children[pos + 1] = z;
 
         // Перемещаем ключ у к узлу х
-        for (int j = x.n - 1; j >= pos; j--) {
+        for (int j = x.n - 2; j >= pos; j--) {
             x.keys[j + 1] = x.keys[j];
         }
         x.keys[pos] = y.keys[T - 1];
@@ -62,7 +69,7 @@ public class BTree {
         x.n = x.n + 1;
     }
 
-    public void insertNotFull(BTNode node, int key) {
+    private void insertNotFull(BTNode node, int key) {
 
         int count = node.n - 1;
 
@@ -74,16 +81,18 @@ public class BTree {
             node.keys[count + 1] = key;
             node.n = node.n + 1;
         } else {
-            while (count >= 0 && node.keys[count] > key) {
+            while (count >= 0 && node.keys[count - 1] > key) {
                 count--;
             }
-            if (node.children[count + 1].n == 2 * T - 1) {
+            if (node.children[count] != null && node.children[count].n == 2 * T - 1) {
                 split(node, count + 1, node.children[count + 1]);
                 // После разделения ключ в середине дочернего узла перемещается вверх, а дочерний узел разделяется на два
                 if (node.keys[count + 1] < key)
                     count++;
             }
-            insertNotFull(node.children[count + 1], key);
+            if (node.children[count] != null) {
+                insertNotFull(node.children[count], key);
+            }
         }
     }
 
