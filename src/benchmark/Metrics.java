@@ -44,7 +44,7 @@ public class Metrics {
                         System.out.println("Ты дурак");
                 }
             }
-            writeMetrics(args, countAverage(averageTime));
+            writeMetrics(args, countAverage(averageTime,iterations));
             FileReader reader = new FileReader(new File("C:\\Users\\MihailLovch\\IdeaProjects\\semester-project-b-tree\\dataset\\metrics\\insert.txt"));
             for (int i = 0; i < 100; i++) {
                 System.out.println(reader.read());
@@ -52,17 +52,20 @@ public class Metrics {
         }
     }
 
-    public static Long[] countAverage(ArrayList<Long> time) {
-        Long[] average = new Long[5];
+    public static long[] countAverage(ArrayList<Long> time, int iterations) {
+        long[] average = new long[5];
         for (int i = 0; i < time.size(); i++) {
             average[i % 5] += time.get(i);
+        }
+        for (int i =0 ; i < 5; i++){
+            average[i] /= iterations;
         }
         return average;
     }
 
-    public static void writeMetrics(String[] args, Long[] time) throws IOException {
+    public static void writeMetrics(String[] args, long[] time) throws IOException {
         try (FileWriter writer = new FileWriter(Paths.get(args[0]).resolve("metrics").resolve(args[2] + ".txt").toString())) {
-            for (Long el : time) {
+            for (long el : time) {
                 writer.write(el + "\n");
             }
             writer.flush();
