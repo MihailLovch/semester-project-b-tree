@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Metrics {
     private static final int INPUT_AMOUNT = 5;
     private static BTree tree;
-
+    private static int FILE_AMOUNT = 9;
     /*
     1 - откуда
     2 - куда
@@ -27,39 +27,36 @@ public class Metrics {
             ArrayList<Long> averageTime = new ArrayList<>(5);
             int iterations = Integer.parseInt(args[4]);
             for (int i = 0; i < iterations; i++) {
-                GenerateInput.generateData();
+                GenerateInput.generateData(args[0]);
+                String[] arg = args;
+                arg[2] = "insert";
                 switch (args[2]) {
                     case "search":
-                        testInsert(args);
-                        averageTime.addAll(Arrays.asList(testSearch(args, tree)));
-                        break;
                     case "remove":
-                        testInsert(args);
-                        averageTime.addAll(Arrays.asList(testRemove(args, tree)));
+                        testMethod(arg);
+                        averageTime.addAll(Arrays.asList(testMethod(args)));
                         break;
                     case "insert":
-                        averageTime.addAll(Arrays.asList(testInsert(args)));
+                        averageTime.addAll(Arrays.asList(testMethod(args)));
                         break;
                     default:
                         System.out.println("Ты дурак");
                 }
             }
             writeMetrics(args, countAverage(averageTime,iterations));
-            FileReader reader = new FileReader(new File("C:\\Users\\MihailLovch\\IdeaProjects\\semester-project-b-tree\\dataset\\metrics\\insert.txt"));
-            for (int i = 0; i < 100; i++) {
-                System.out.println(reader.read());
-            }
+
         }
     }
 
     public static long[] countAverage(ArrayList<Long> time, int iterations) {
-        long[] average = new long[5];
+        long[] average = new long[FILE_AMOUNT];
         for (int i = 0; i < time.size(); i++) {
-            average[i % 5] += time.get(i);
+            average[i % FILE_AMOUNT] += time.get(i);
         }
-        for (int i =0 ; i < 5; i++){
+        for (int i =0 ; i < FILE_AMOUNT; i++){
             average[i] /= iterations;
         }
+        average = Arrays.stream(average).sorted().toArray();
         return average;
     }
 
@@ -71,60 +68,31 @@ public class Metrics {
             writer.flush();
         }
     }
-
-    public static Long[] testSearch(String[] args, BTree bTree) throws IOException {
-        Path path = Paths.get(args[0]).resolve("search").resolve(args[3]);
-        Long[] time = new Long[5];
-        long start;
-        long end;
-        int c = 0;
-
-        for (int i = 100; i <= 1000000; i *= 10) {
-            try (FileReader reader = new FileReader(new File(path.resolve(i + ".txt").toString()))) {
-                start = System.currentTimeMillis();
-                for (int k = 0; k < i; k++) {
-                    bTree.search(bTree.root, reader.read());
-                }
-                end = System.currentTimeMillis();
-                time[c++] = end - start;
-            }
+    public static Long[] testMethod(String[] args) throws IOException {
+        Path path = Paths.get(args[0]).resolve("methodsData").resolve(args[3]);
+        String command = args[2];
+        if (command.equals("insert")) {
+            tree = new BTree(6);
         }
-        return time;
-    }
-
-    public static Long[] testRemove(String[] args, BTree bTree) throws IOException {
-        Path path = Paths.get(args[0]).resolve("remove").resolve(args[3]);
-        Long[] time = new Long[5];
+        Long[] time = new Long[FILE_AMOUNT];
         long start;
         long end;
         int c = 0;
 
-        for (int i = 100; i <= 1000000; i *= 10) {
-            try (FileReader reader = new FileReader(new File(path.resolve(i + ".txt").toString()))) {
-                start = System.currentTimeMillis();
-                for (int k = 0; k < i; k++) {
-                    bTree.remove(bTree.root, reader.read());
-                }
-                end = System.currentTimeMillis();
-                time[c++] = end - start;
-            }
-        }
-        return time;
-    }
 
-    public static Long[] testInsert(String[] args) throws IOException {
-        Path path = Paths.get(args[0]).resolve("insert").resolve(args[3]);
-        tree = new BTree(6);
-        Long[] time = new Long[5];
-        long start;
-        long end;
-        int c = 0;
-
-        for (int i = 100; i <= 1000000; i *= 10) {
-            try (FileReader reader = new FileReader(new File(path.resolve(i + ".txt").toString()))) {
+        for (File file : new File(path.toString()).listFiles()){
+            try (FileReader reader = new FileReader(file)){
                 start = System.currentTimeMillis();
-                for (int k = 0; k < i; k++) {
-                    tree.insert(reader.read());
+                int num;
+                while ((num = reader.read()) != -1){
+                    switch (command){
+                        case "insert":
+                            tree.insert(num);
+                        case "remove":
+                            tree.remove(num);
+                        case "search":
+                            tree.search(num);
+                    }
                 }
                 end = System.currentTimeMillis();
                 time[c++] = end - start;
