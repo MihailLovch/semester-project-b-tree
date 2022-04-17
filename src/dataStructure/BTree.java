@@ -19,7 +19,7 @@ public class BTree {
         return searchHelper(root, key);
     }
 
-    public boolean remove(int key) {
+    public boolean remove(int key){
         return removeHelper(root, key);
     }
 
@@ -163,7 +163,7 @@ public class BTree {
             ptr = node;
             ptr = ptr.children[position];
             newkey = ptr.keys[ptr.n - 1];
-            while (!ptr.isLeaf) {
+            while (!ptr.isLeaf){
                 ptr = ptr.children[ptr.n];
             }
             newkey = ptr.keys[ptr.n - 1];
@@ -258,7 +258,6 @@ public class BTree {
             }
         }
     }
-
     private BTNode searchHelper(BTNode node, int key) { //auxiliary method for search
         int count = -1;
         if (node == null)

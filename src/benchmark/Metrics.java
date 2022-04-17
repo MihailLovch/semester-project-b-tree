@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Metrics {
     private static final int INPUT_AMOUNT = 5;
     private static BTree tree;
-    private static int FILE_AMOUNT = 9;
+    private static final int FILE_AMOUNT = 14;
     /*
     1 - откуда
     2 - куда
@@ -88,10 +88,13 @@ public class Metrics {
                     switch (command){
                         case "insert":
                             tree.insert(num);
+                            break;
                         case "remove":
                             tree.remove(num);
+                            break;
                         case "search":
                             tree.search(num);
+                            break;
                     }
                 }
                 end = System.currentTimeMillis();
