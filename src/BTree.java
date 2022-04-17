@@ -1,3 +1,5 @@
+package dataStructure;
+
 public class BTree {
     public final int T;
     public BTNode root;
