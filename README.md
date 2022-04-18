@@ -99,6 +99,6 @@ javac Metrics.java && java Metric <input> <output> <command> <set> <iterations>
 
 _Список использованных при реализации структуры данных источников._
 
-[Хабр](https://habr.com/ru/post/114154/)
-[Хабр](https://habr.com/ru/post/337594/)
-[YouTube](https://www.youtube.com/watch?v=WXXetwePSRk)
+[Хабр](https://habr.com/ru/post/114154/);
+[Хабр](https://habr.com/ru/post/337594/);
+[YouTube](https://www.youtube.com/watch?v=WXXetwePSRk);
