@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Metrics {
     private static final int INPUT_AMOUNT = 5;
     private static BTree tree;
-    private static final int FILE_AMOUNT = 9;
+    private static final int FILE_AMOUNT = 14;
     /*
     1 - откуда
     2 - куда
@@ -28,7 +28,10 @@ public class Metrics {
             int iterations = Integer.parseInt(args[4]);
             for (int i = 0; i < iterations; i++) {
                 GenerateInput.generateData(args[0]);
-                String[] arg = args;
+                String[] arg = new String[args.length];
+                for (int j =0; j < args.length; j++){
+                    arg[j] = args[j];
+                }
                 arg[2] = "insert";
                 switch (args[2]) {
                     case "search":
