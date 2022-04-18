@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Metrics {
     private static final int INPUT_AMOUNT = 5;
     private static BTree tree;
-    private static final int FILE_AMOUNT = 14;
+    private static final int FILE_AMOUNT = 9;
     /*
     1 - откуда
     2 - куда

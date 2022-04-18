@@ -6,7 +6,7 @@ public class BTree {
 
     public BTree(int t) {
         T = t;
-        this.root = new BTNode(true);
+        this.root = new BTNode(true, null);
         root.n = 0;
     }
 
@@ -19,12 +19,22 @@ public class BTree {
         return searchHelper(root, key);
     }
 
+    public boolean contains(BTNode nodeToSearch){
+        for (int i = 0; i < nodeToSearch.n - 2; i++){
+            if (search(nodeToSearch.keys[i]) == null || search(nodeToSearch.keys[i + 1]) != search(nodeToSearch.keys[i])){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean remove(int key){
         return removeHelper(root, key);
     }
 
     private void split(BTNode x, int pos, BTNode y) {
-        BTNode z = new BTNode(y.isLeaf);
+        BTNode z = new BTNode(y.isLeaf, y);
         z.n = T - 1;
 
         for (int j = 0; j < T - 1; j++) {
@@ -83,19 +93,19 @@ public class BTree {
 
     public boolean insert(int key) {
         if (root == null) {
-            root = new BTNode(true);
+            root = new BTNode(true, null);
             root.keys[0] = key;
             root.n = 1;
             return true;
         } else {
             if (root.n == 2 * T - 1) {
-                BTNode s = new BTNode(false);
+                BTNode new_root = new BTNode(false, null);
                 // The old root node becomes a child node of the new root node
-                s.children[0] = root;
+                new_root.children[0] = root;
                 // We separate the old root node and give the key to the new node
-                split(s, 0, root);
-                insertNotFull(s, key);
-                root = s;
+                split(new_root, 0, root);
+                insertNotFull(new_root, key);
+                root = new_root;
             } else {
                 insertNotFull(root, key);
             }
@@ -209,34 +219,17 @@ public class BTree {
                 break;
             }
         }
-        BTNode parent = ptr.parent;
-        for (int j = 0; j <= parent.n; j++) {
-            if (parent.children[j] == ptr) {
-                positionSon = j;
-                break;
-            }
-        }
-        if (positionSon == 0) {
-            if (parent.children[positionSon + 1].n > (T - 1)) {
-                k1 = parent.children[positionSon + 1].keys[0];
-                k2 = parent.keys[positionSon];
-                insertToNode(k2, ptr);
-                removeFromNode(key, ptr);
-                parent.keys[positionSon] = k1;
-                removeFromNode(k1, parent.children[positionSon + 1]);
-            }
-        } else {
-            if (positionSon == parent.n) {
-                if (parent.children[positionSon - 1].n > (T - 1)) {
-                    BTNode temp = parent.children[positionSon - 1];
-                    k1 = temp.keys[temp.n - 1];
-                    k2 = parent.keys[positionSon - 1];
-                    insertToNode(k2, ptr);
-                    removeFromNode(key, ptr);
-                    parent.keys[positionSon - 1] = k1;
-                    removeFromNode(k1, temp);
+
+        if (node.parent != root && node.parentSet()) {
+            BTNode parent = ptr.parent;
+            for (int j = 0; j <= parent.n - 1; j++) {
+                if (parent.children[j] == ptr) {
+                    positionSon = j;
+                    break;
                 }
-            } else {
+            }
+
+            if (positionSon == 0) {
                 if (parent.children[positionSon + 1].n > (T - 1)) {
                     k1 = parent.children[positionSon + 1].keys[0];
                     k2 = parent.keys[positionSon];
@@ -244,7 +237,9 @@ public class BTree {
                     removeFromNode(key, ptr);
                     parent.keys[positionSon] = k1;
                     removeFromNode(k1, parent.children[positionSon + 1]);
-                } else {
+                }
+            } else {
+                if (positionSon == parent.n) {
                     if (parent.children[positionSon - 1].n > (T - 1)) {
                         BTNode temp = parent.children[positionSon - 1];
                         k1 = temp.keys[temp.n - 1];
@@ -253,6 +248,25 @@ public class BTree {
                         removeFromNode(key, ptr);
                         parent.keys[positionSon - 1] = k1;
                         removeFromNode(k1, temp);
+                    }
+                } else {
+                    if (parent.children[positionSon + 1].n > (T - 1)) {
+                        k1 = parent.children[positionSon + 1].keys[0];
+                        k2 = parent.keys[positionSon];
+                        insertToNode(k2, ptr);
+                        removeFromNode(key, ptr);
+                        parent.keys[positionSon] = k1;
+                        removeFromNode(k1, parent.children[positionSon + 1]);
+                    } else {
+                        if (parent.children[positionSon - 1].n > (T - 1)) {
+                            BTNode temp = parent.children[positionSon - 1];
+                            k1 = temp.keys[temp.n - 1];
+                            k2 = parent.keys[positionSon - 1];
+                            insertToNode(k2, ptr);
+                            removeFromNode(key, ptr);
+                            parent.keys[positionSon - 1] = k1;
+                            removeFromNode(k1, temp);
+                        }
                     }
                 }
             }
@@ -263,7 +277,7 @@ public class BTree {
         if (node == null)
             return null;
 
-        for (int i = 0; i < node.n; i++) {
+        for (int i = 0; i < node.n - 1; i++) {
             if (key < node.keys[i]) {
                 break;
             }
@@ -319,10 +333,7 @@ public class BTree {
         if (ptr.isLeaf) {
             if (ptr.n > (T - 1)) removeFromNode(key, ptr);
             else removeLeaf(key, ptr);
-        } else {
-            removeHelper(ptr, key);
         }
-
         return true;
     }
 
@@ -331,11 +342,40 @@ public class BTree {
         public int keys[] = new int[2 * T - 1];
         public int n = keys.length; // number of keys in node
         BTNode children[] = new BTNode[n + 1];
-        boolean isLeaf = true;
+        boolean isLeaf;
         BTNode parent;
 
-        public BTNode(Boolean isLeaf) {
+        public BTNode(Boolean isLeaf, BTNode parent) {
+            this.parent = parent;
             this.isLeaf = isLeaf;
+            for (int i = 0; i < children.length; i++){
+                if (children[i] != null){
+                    children[i].parent = this;
+                }
+            }
+        }
+
+        private BTNode parentSearch(BTNode nodeFrom, BTNode node){
+            int count = 0;
+            if (nodeFrom.isLeaf){
+                return null;
+            }
+
+            for (int i = 0; i < nodeFrom.children.length - 1; i++) {
+                if (node == nodeFrom.children[i]) {
+                    return nodeFrom;
+                }
+            }
+
+            return parentSearch(nodeFrom.children[++count], node);
+        }
+
+        public boolean parentSet(){
+            if (!contains(this)){
+                return false;
+            }
+            this.parent = parentSearch(root, this);
+            return true;
         }
     }
 }
