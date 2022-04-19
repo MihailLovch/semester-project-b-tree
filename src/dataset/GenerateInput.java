@@ -40,7 +40,7 @@ public class GenerateInput {
                         int amount = Integer.parseInt(file.getName().substring(0, file.getName().indexOf('.')));
                         try (FileWriter fileWriter = new FileWriter(file)) {
                             for (int k = 0; k < amount; k++) {
-                                fileWriter.write(random.nextInt(10*index));
+                                fileWriter.write(random.nextInt(1000*index));
                                 fileWriter.write("\n");
                             }
                             fileWriter.flush();
